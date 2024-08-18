@@ -6,9 +6,7 @@ from langchain_community.vectorstores import Chroma
 
 from langchain_community import embeddings
 
-#from langchain_community.llms import Ollama
-
-from langchain_community.chat_models import ChatOllama
+from langchain_community.llms import Ollama
 
 from langchain_core.runnables import RunnablePassthrough
 
@@ -18,27 +16,40 @@ from langchain_core.prompts import ChatPromptTemplate
 
 from langchain.text_splitter import CharacterTextSplitter 
 
-# URL processing
+from langchain_community.embeddings import OllamaEmbeddings
+
+from langchain.schema.document import Document
+
+ # URL processing
 def process_input(urls, question):
-    model_local = ChatOllama(model="mistral") #Ollama(model="mistral")
+    model_local = Ollama(model="mistral")
     
     # Convert string of URLs to list
     urls_list = urls.split("\n")
-    docs = [WebBaseLoader(url).load() for url in urls_list]
-    docs_list = [item for sublist in docs for item in sublist]
+
+    
+    # docs = [WebBaseLoader(url).load() for url in urls_list]
+    # docs_list = [item for sublist in docs for item in sublist]
     
     #split the text into chunks
     
-    text_splitter = CharacterTextSplitter.from_tiktoken_encoder(chunk_size=7500, chunk_overlap=100)
-    doc_splits = text_splitter.split_documents(docs_list)
-    
+    # text_splitter = CharacterTextSplitter.from_tiktoken_encoder(chunk_size=7500, chunk_overlap=100)
+    # doc_splits = text_splitter.split_documents(docs_list)
+
     #convert text chunks into embeddings and store in vector database
 
+    text_splitter = CharacterTextSplitter(chunk_size=100, chunk_overlap=20)
+    text = "To pip install pandas use the command pip install pandas."
+    docs = [Document(page_content=x) for x in text_splitter.split_text(text)]
+
     vectorstore = Chroma.from_documents(
-        documents=doc_splits,
-        collection_name="rag-chroma",
-        embedding=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text'),
-    )
+    documents=docs,
+    collection_name="rag-chroma",
+    embedding=embeddings.ollama.OllamaEmbeddings(
+        base_url='http://localhost:8501',
+        model='nomic-embed-text'
+    ),
+)
     retriever = vectorstore.as_retriever()
     
     #perform the RAG 
@@ -55,6 +66,7 @@ def process_input(urls, question):
         | StrOutputParser()
     )
     return after_rag_chain.invoke(question) 
+
 
 st.title("Document Query with Ollama")
 st.write("Enter URLs (one per line) and a question to query the documents.")
