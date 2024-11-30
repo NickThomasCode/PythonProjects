@@ -17,7 +17,7 @@ def assign_without_conflicts(names, assignee):
             not (name == 'Nick' and assignee == 'Willow') and
             not (name == 'Willow' and assignee == 'Nick') and
             not (name == 'Christina' and assignee == 'Brennan') and
-            not (name == 'Brennan' and assignee == 'Willow')
+            not (name == 'Brennan' and assignee == 'Christina')
             for name, assignee in zip(shuffled_names, assignee)
         ):
             return dict(zip(assignee, shuffled_names))
