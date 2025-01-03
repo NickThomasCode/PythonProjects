@@ -2,7 +2,7 @@ import os
 import tempfile
 import streamlit as st
 from streamlit_chat import message
-from llm.hello_llm.chatBot import ChatPDF
+from chatBot import ChatPDF
 
 st.set_page_config(page_title="ChatPDF")
 
