@@ -1,0 +1,6 @@
+1. Get data (game rolling averages per week)
+2. Get historical data for each week for each game
+3. Get game matchup winners and add to the data
+4. Prepare the data for the model
+5. Train the model
+6. Make predictions on the model
